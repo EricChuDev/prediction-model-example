@@ -13,14 +13,14 @@ df = pd.read_csv('example.csv')
 # Create correlation heatmap
 plt.figure(figsize=(10, 8))
 sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
-plt.title('Correlation Heatmap of Environmental Factors vs Plant Height')
+plt.title('Correlation Heatmap of Factors vs Sliding Time')
 plt.tight_layout()
 plt.savefig('correlation_heatmap.png')
 plt.close()
 
 # Prepare features and target
-X = df.drop('plant_height_cm', axis=1)
-y = df['plant_height_cm']
+X = df.drop('sliding_time_s', axis=1)
+y = df['sliding_time_s']
 
 # Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -69,23 +69,40 @@ for feature, importance in feature_importance.items():
 plt.figure(figsize=(10, 6))
 plt.bar(feature_importance.keys(), feature_importance.values())
 plt.xticks(rotation=45)
-plt.title('Feature Importance in Predicting Plant Height')
+plt.title('Feature Importance in Predicting Sliding Time')
 plt.tight_layout()
 plt.savefig('feature_importance.png')
 plt.close()
 
-# Example prediction for a new experimental condition
+# Example prediction for a new experimental setup
 print("\nExample Prediction:")
 print("-----------------")
 example_condition = pd.DataFrame({
-    'temperature': [24.0],
-    'humidity': [65],
-    'light_intensity': [800],
-    'water_ml_daily': [50],
-    'nutrient_concentration': [300],
-    'co2_levels': [450]
+    'starting_position_m': [2.0],
+    'mass_kg': [0.5],
+    'friction_coefficient': [0.15],
+    'surface_area_cm2': [25],
+    'angle_degrees': [30]
 })
 
 for name, model in models.items():
-    predicted_height = model.predict(example_condition)[0]
-    print(f"{name} predicts plant height: {predicted_height:.2f} cm")
+    predicted_time = model.predict(example_condition)[0]
+    print(f"{name} predicts sliding time: {predicted_time:.2f} seconds")
+
+# Additional physics-based visualization
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 2, 1)
+plt.scatter(df['angle_degrees'], df['sliding_time_s'])
+plt.xlabel('Angle (degrees)')
+plt.ylabel('Sliding Time (s)')
+plt.title('Angle vs Sliding Time')
+
+plt.subplot(1, 2, 2)
+plt.scatter(df['friction_coefficient'], df['sliding_time_s'])
+plt.xlabel('Friction Coefficient')
+plt.ylabel('Sliding Time (s)')
+plt.title('Friction vs Sliding Time')
+
+plt.tight_layout()
+plt.savefig('physics_relationships.png')
+plt.close()
